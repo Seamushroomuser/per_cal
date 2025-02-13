@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearest Orphanages</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+    <h1>Nearest Orphanages</h1>
+    <div id="map" style="height: 500px;"></div>
+    <div id="orphanage-details"></div>
+    
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([21.84, 82.79], 4);
+        
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+        
+        // Get user's location
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var userLat = position.coords.latitude;
+                var userLng = position.coords.longitude;
+                map.setView([userLat, userLng], 12);
+                
+                // Add marker for user's location
+                L.marker([userLat, userLng]).addTo(map)
+                    .bindPopup("You are here").openPopup();
+                
+                // Fetch nearby orphanages (Example Data)
+                var orphanages = [
+                    { name: "Orphanage A", lat: userLat + 0.02, lng: userLng + 0.02, address: "123 Main St", contact: "123-456-7890" },
+                    { name: "Orphanage B", lat: userLat - 0.02, lng: userLng - 0.02, address: "456 Elm St", contact: "987-654-3210" }
+                ];
+                
+                var detailsDiv = document.getElementById("orphanage-details");
+                detailsDiv.innerHTML = "<h2>Orphanage Details</h2>";
+                
+                orphanages.forEach(function(orphanage) {
+                    L.marker([orphanage.lat, orphanage.lng]).addTo(map)
+                        .bindPopup(`<b>${orphanage.name}</b><br>${orphanage.address}<br>Contact: ${orphanage.contact}`);
+                    
+                    detailsDiv.innerHTML += `<p><strong>${orphanage.name}</strong><br>Address: ${orphanage.address}<br>Contact: ${orphanage.contact}</p>`;
+                });
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    </script>
+</body>
+</html>
